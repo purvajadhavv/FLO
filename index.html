@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Invoice Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h2>Invoice Generator</h2>
+
+    <!-- Guest Info -->
+    <input type="text" id="name" placeholder="Guest Name">
+    <input type="date" id="checkin">
+    <input type="date" id="checkout">
+
+    <!-- Charges -->
+    <input type="number" id="room" placeholder="Room Charges">
+    <input type="number" id="food" placeholder="Food Charges">
+    <input type="number" id="other" placeholder="Other Charges">
+
+    <!-- GST -->
+    <input type="number" id="gst" placeholder="GST % (e.g. 12)">
+
+    <!-- Advance -->
+    <input type="number" id="advance" placeholder="Advance Paid">
+
+    <!-- Buttons -->
+    <button onclick="generateInvoice()">Generate Invoice</button>
+    <button onclick="downloadJSON()">Save JSON</button>
+    <button onclick="loadJSON()">Load JSON</button>
+    <button onclick="window.print()">Print</button>
+
+    <!-- Output -->
+    <div id="invoice"></div>
+
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
