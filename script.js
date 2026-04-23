@@ -68,3 +68,45 @@ function generateInvoice() {
     balance
   };
 }
+
+
+function downloadJSON() {
+  let data = JSON.stringify(window.currentInvoice, null, 2);
+
+  let blob = new Blob([data], { type: "application/json" });
+  let a = document.createElement("a");
+
+  a.href = URL.createObjectURL(blob);
+  a.download = window.currentInvoice.invoiceNo + ".json";
+  a.click();
+}
+
+
+function loadJSON() {
+  let input = document.createElement("input");
+  input.type = "file";
+
+  input.onchange = e => {
+    let file = e.target.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(event) {
+      let data = JSON.parse(event.target.result);
+
+      document.getElementById("name").value = data.name;
+      document.getElementById("checkin").value = data.checkin;
+      document.getElementById("checkout").value = data.checkout;
+      document.getElementById("room").value = data.room;
+      document.getElementById("food").value = data.food;
+      document.getElementById("other").value = data.other;
+      document.getElementById("gst").value = data.gstPercent;
+      document.getElementById("advance").value = data.advance;
+
+      generateInvoice();
+    };
+
+    reader.readAsText(file);
+  };
+
+  input.click();
+}
