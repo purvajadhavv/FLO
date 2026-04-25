@@ -1,45 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Invoice Generator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Flo Villa | Management Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
-  <div class="container">
+<nav class="luxury-nav no-print">
+    <div class="nav-container">
+        <div class="brand-wrapper" onclick="location.reload()">
+            <div class="logo-icon">FV</div>
+            <h1 class="brand">THE FLO VILLA</h1>
+        </div>
+        <div class="nav-links">
+            <button class="nav-link" onclick="showView('home')">Dashboard</button>
+            <button class="nav-link" onclick="showView('history')">History</button>
+        </div>
+    </div>
+</nav>
 
-    <h2>Invoice Generator</h2>
+<div class="container">
+    <div id="homeView" class="view">
+        <header class="welcome-header">
+            <span class="subtitle">MANAGEMENT PORTAL</span>
+            <h2 class="luxury-text">Property Dashboard</h2>
+            <div class="accent-line"></div>
+        </header>
 
-    <!-- Guest Info -->
-    <input type="text" id="name" placeholder="Guest Name">
-    <input type="date" id="checkin">
-    <input type="date" id="checkout">
+        <div class="action-grid">
+            <div class="luxury-card" onclick="openForm('confirmation')">
+                <div class="card-content">
+                    <span class="card-index">01</span>
+                    <h3>Booking Confirmation</h3>
+                    <p>Generate arrival documentation and secure guest deposits.</p>
+                    <span class="cta-arrow">Open Form →</span>
+                </div>
+                <div class="card-bg-icon">📅</div>
+            </div>
 
-    <!-- Charges -->
-    <input type="number" id="room" placeholder="Room Charges">
-    <input type="number" id="food" placeholder="Food Charges">
-    <input type="number" id="other" placeholder="Other Charges">
+            <div class="luxury-card" onclick="openForm('bill')">
+                <div class="card-content">
+                    <span class="card-index">02</span>
+                    <h3>Final Settlement</h3>
+                    <p>Calculate stay totals, add-ons, and generate final tax invoices.</p>
+                    <span class="cta-arrow">Open Form →</span>
+                </div>
+                <div class="card-bg-icon">🧾</div>
+            </div>
+        </div>
+    </div>
 
-    <!-- GST -->
-    <input type="number" id="gst" placeholder="GST % (e.g. 12)">
+    <div id="formView" class="view" style="display:none;">
+        <button class="btn-back" onclick="showView('home')">← Return to Dashboard</button>
+        <div class="card form-container">
+            <h2 id="formTitle" class="luxury-text">New Entry</h2>
+            
+            <div class="input-group" id="refLookup" style="display:none;">
+                <input type="text" id="lookupRef" placeholder="Search Booking ID (e.g. FLO001)">
+                <button class="btn-fetch" onclick="fetchBookingDetails()">Fetch Data</button>
+            </div>
 
-    <!-- Advance -->
-    <input type="number" id="advance" placeholder="Advance Paid">
+            <div class="section-label">Guest Information</div>
+            <div class="grid-2">
+                <div class="input-row">
+                    <select id="prefix" style="width: 80px;"><option value="Mr.">Mr.</option><option value="Mrs.">Mrs.</option><option value="Ms.">Ms.</option></select>
+                    <input type="text" id="guestName" placeholder="Full Name">
+                </div>
+                <input type="text" id="phone" placeholder="Phone (10 Digits)" maxlength="10">
+                <input type="email" id="guestEmail" placeholder="Email Address">
+                <input type="text" id="bookingId" placeholder="Booking ID" readonly class="readonly-field">
+                <input type="text" id="channel" placeholder="Booking Channel / Mode">
+            </div>
 
-    <!-- Buttons -->
-    <button onclick="generateInvoice()">Generate Invoice</button>
-    <button onclick="downloadJSON()">Save JSON</button>
-    <button onclick="loadJSON()">Load JSON</button>
-    <button onclick="window.print()">Print</button>
+            <div class="section-label">Stay Details</div>
+            <div class="grid-2">
+                <div class="field-stack">
+                    <label>Check-in</label>
+                    <input type="date" id="checkin">
+                </div>
+                <div class="field-stack">
+                    <label>Check-out</label>
+                    <input type="date" id="checkout">
+                </div>
+                <input type="number" id="adults" placeholder="Adults">
+                <input type="number" id="children" placeholder="Children">
+                <div style="grid-column: span 2;">
+                    <input type="text" id="totalNightsDisplay" placeholder="Total Nights: 0" readonly class="highlight-field">
+                </div>
+            </div>
 
-    <!-- Output -->
-    <div id="invoice"></div>
+            <div class="section-label">Add-ons</div>
+            <div id="addonsContainer"></div>
+            <button class="btn-outline" onclick="addNewRow()">+ Add Item</button>
 
-  </div>
+            <div class="section-label">Finance</div>
+            <div class="grid-2">
+                <div class="field-stack"><label>Stay Amount</label><input type="number" id="pricePerNight" placeholder="0.00"></div>
+                <div class="field-stack"><label>Discount</label><input type="number" id="discount" placeholder="0.00"></div>
+                <div class="field-stack"><label>GST %</label><input type="number" id="gst" placeholder="0"></div>
+                <div class="field-stack"><label>Advance Paid</label><input type="number" id="advance" placeholder="0.00"></div>
+                <div class="field-stack">
+                    <label>Payment Mode</label>
+                    <select id="paymentMode">
+                        <option value="Cash">Cash</option><option value="Online">Online</option><option value="Bank">Bank</option>
+                    </select>
+                </div>
+            </div>
 
-  <script src="script.js"></script>
+            <button class="btn-primary" onclick="processSubmission()">Preview Document</button>
+        </div>
+    </div>
 
+    <div id="historyView" class="view" style="display:none;">
+        <header class="welcome-header">
+            <h2 class="luxury-text">Management History</h2>
+        </header>
+        
+        <div class="filter-bar card">
+            <div class="filter-group">
+                <label>Filter Type</label>
+                <select id="filterType" onchange="loadHistory()">
+                    <option value="all">All Documents</option>
+                    <option value="confirmation">Confirmations</option>
+                    <option value="bill">Bills</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Sort By</label>
+                <select id="sortBy" onchange="loadHistory()">
+                    <option value="dateNew">Newest First</option>
+                    <option value="dateOld">Oldest First</option>
+                    <option value="id">Booking ID</option>
+                    <option value="name">Guest Name</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="historyContainer"></div>
+    </div>
+
+    <div id="printArea"></div>
+</div>
+
+<div id="hoverPreview" class="preview-popup"></div>
+
+<script src="script.js"></script>
 </body>
 </html>
